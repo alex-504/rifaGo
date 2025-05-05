@@ -1,0 +1,41 @@
+{
+  "name": "rifago",
+  "version": "1.0.0",
+  "description": "Sistema RifaGo - Gestão de rifeiros/vendedores consignados",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "mobile"
+  ],
+  "scripts": {
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "start:mobile": "cd mobile && npm start",
+    "dev": "npm run dev:backend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:mobile": "cd mobile && npm run dev",
+    "install:all": "npm install && npm run install:backend && npm run install:frontend && npm run install:mobile",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:mobile": "cd mobile && npm install",
+    "lint": "npm run lint:backend && npm run lint:frontend && npm run lint:mobile",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:mobile": "cd mobile && npm run lint",
+    "format": "npm run format:backend && npm run format:frontend && npm run format:mobile",
+    "format:backend": "cd backend && npm run format",
+    "format:frontend": "cd frontend && npm run format",
+    "format:mobile": "cd mobile && npm run format"
+  },
+  "keywords": [
+    "rifago",
+    "gestão",
+    "vendas",
+    "consignação"
+  ],
+  "author": "Alexandre Vieira",
+  "license": "ISC"
+} 

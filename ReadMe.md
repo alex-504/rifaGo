@@ -519,6 +519,24 @@ O sistema possui uma hierarquia de usuários com diferentes níveis de acesso:
 - Dados sensíveis criptografados
 - Validação de entrada em todos os endpoints
 - Rate limiting para prevenir abuso
+- Senhas e chaves armazenadas em variáveis de ambiente
+- Nunca comitar credenciais no repositório
+- Usar gerenciador de segredos em produção
+- Rotação regular de chaves e tokens
+- Monitoramento de tentativas de acesso suspeitas
+
+### 8.3 Configuração de Ambiente
+1. Copie o arquivo `.env.example` para `.env`
+2. Gere valores seguros para todas as credenciais:
+   - Use senhas fortes (mínimo 12 caracteres)
+   - Use caracteres especiais, números e letras
+   - Gere um JWT_SECRET único e complexo
+   - Nunca reutilize senhas entre ambientes
+3. Em produção:
+   - Use um gerenciador de segredos (AWS Secrets Manager, HashiCorp Vault)
+   - Configure rotação automática de credenciais
+   - Monitore o uso de credenciais
+   - Mantenha logs de auditoria
 
 ## 9. Plano de Implementação
 
