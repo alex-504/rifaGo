@@ -1,5 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database/connection');
+const User = require('./User');
+const Client = require('./Client');
 
 class EndClient extends Model {}
 
@@ -42,7 +44,7 @@ EndClient.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'clients',
+        model: Client,
         key: 'id',
       },
     },
@@ -50,7 +52,7 @@ EndClient.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'users',
+        model: User,
         key: 'id',
       },
     },
@@ -62,5 +64,9 @@ EndClient.init(
     timestamps: true,
   }
 );
+
+// Relacionamentos
+EndClient.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
+EndClient.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
 
 module.exports = EndClient; 

@@ -9,8 +9,8 @@ async function testAuth() {
     // Teste de login
     console.log('1. Testando login com credenciais válidas...');
     const loginResponse = await axios.post(`${API_URL}/auth/login`, {
-      email: 'admin@rifago.com',
-      password: 'admin123',
+      email: process.env.TEST_ADMIN_EMAIL || 'admin@example.com',
+      password: process.env.TEST_ADMIN_PASSWORD || 'test123',
     });
     console.log('Login bem-sucedido!');
     console.log('Token recebido:', loginResponse.data.token);
@@ -36,8 +36,8 @@ async function testAuth() {
     console.log('3. Testando login com credenciais inválidas...');
     try {
       await axios.post(`${API_URL}/auth/login`, {
-        email: 'admin@rifago.com',
-        password: 'senha_errada',
+        email: process.env.TEST_ADMIN_EMAIL || 'admin@example.com',
+        password: 'wrong_password',
       });
     } catch (error) {
       console.log('Erro esperado:', error.response.data.error);

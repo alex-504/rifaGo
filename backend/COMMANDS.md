@@ -13,8 +13,8 @@ node src/server.js
 curl -X POST http://localhost:3000/api/auth/login \
 -H "Content-Type: application/json" \
 -d '{
-  "email": "admin@rifago.com",
-  "password": "admin123"
+  "email": "admin@example.com",
+  "password": "your_password_here"
 }'
 ```
 
@@ -23,8 +23,8 @@ curl -X POST http://localhost:3000/api/auth/login \
 curl -X POST http://localhost:3000/api/auth/login \
 -H "Content-Type: application/json" \
 -d '{
-  "email": "alexandre.ealimentos@gmail.com",
-  "password": "2211"
+  "email": "new_admin@example.com",
+  "password": "your_password_here"
 }'
 ```
 
@@ -33,39 +33,39 @@ curl -X POST http://localhost:3000/api/auth/login \
 ### Listar Usuários
 ```bash
 curl http://localhost:3000/api/users \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### Criar Usuário
 ```bash
 curl -X POST http://localhost:3000/api/users \
--H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d '{
-  "name": "Cliente Teste",
-  "email": "cliente@teste.com",
-  "password": "senha123",
+  "name": "Example User",
+  "email": "user@example.com",
+  "password": "your_password_here",
   "role": "client_admin"
 }'
 ```
 
 ### Atualizar Usuário
 ```bash
-curl -X PUT http://localhost:3000/api/users/ID_DO_USUARIO \
--H "Authorization: Bearer SEU_TOKEN_AQUI" \
+curl -X PUT http://localhost:3000/api/users/USER_ID \
+-H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d '{
-  "name": "Novo Nome",
-  "email": "novo@email.com",
-  "password": "novasenha",
+  "name": "Updated Name",
+  "email": "updated@example.com",
+  "password": "your_new_password",
   "role": "app_admin"
 }'
 ```
 
 ### Deletar Usuário
 ```bash
-curl -X DELETE http://localhost:3000/api/users/ID_DO_USUARIO \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
+curl -X DELETE http://localhost:3000/api/users/USER_ID \
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ## Clientes
@@ -73,39 +73,39 @@ curl -X DELETE http://localhost:3000/api/users/ID_DO_USUARIO \
 ### Listar Clientes
 ```bash
 curl http://localhost:3000/api/clients \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### Obter Cliente Específico
 ```bash
-curl http://localhost:3000/api/clients/ID_DO_CLIENTE \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
+curl http://localhost:3000/api/clients/CLIENT_ID \
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### Criar Cliente
 ```bash
 curl -X POST http://localhost:3000/api/clients \
--H "Authorization: Bearer SEU_TOKEN_AQUI" \
+-H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d '{
-  "name": "Empresa ABC",
-  "address": "Rua Principal, 123",
-  "city": "São Paulo",
-  "state": "SP",
+  "name": "Example Company",
+  "address": "123 Main St",
+  "city": "Example City",
+  "state": "EX",
   "phone": "(11) 99999-9999"
 }'
 ```
 
 ### Atualizar Cliente
 ```bash
-curl -X PUT http://localhost:3000/api/clients/ID_DO_CLIENTE \
--H "Authorization: Bearer SEU_TOKEN_AQUI" \
+curl -X PUT http://localhost:3000/api/clients/CLIENT_ID \
+-H "Authorization: Bearer YOUR_TOKEN_HERE" \
 -H "Content-Type: application/json" \
 -d '{
-  "name": "Empresa ABC Atualizada",
-  "address": "Rua Nova, 456",
-  "city": "São Paulo",
-  "state": "SP",
+  "name": "Updated Company",
+  "address": "456 New St",
+  "city": "Example City",
+  "state": "EX",
   "phone": "(11) 98888-8888",
   "status": "active"
 }'
@@ -113,8 +113,8 @@ curl -X PUT http://localhost:3000/api/clients/ID_DO_CLIENTE \
 
 ### Deletar Cliente
 ```bash
-curl -X DELETE http://localhost:3000/api/clients/ID_DO_CLIENTE \
--H "Authorization: Bearer SEU_TOKEN_AQUI"
+curl -X DELETE http://localhost:3000/api/clients/CLIENT_ID \
+-H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ## Dicas de Uso
@@ -137,6 +137,14 @@ curl -X DELETE http://localhost:3000/api/clients/ID_DO_CLIENTE \
    - Use `-v` no curl para ver detalhes da requisição: `curl -v ...`
    - Verifique se o servidor está rodando na porta correta
    - Confirme se está no diretório correto antes de executar os comandos
+
+## Segurança
+
+⚠️ **IMPORTANTE**: 
+- Nunca compartilhe ou comite credenciais reais no repositório
+- Use variáveis de ambiente para armazenar senhas e tokens
+- Mantenha suas credenciais seguras e não as exponha em documentação
+- Considere usar um gerenciador de segredos para desenvolvimento
 
 ## Próximos Passos
 

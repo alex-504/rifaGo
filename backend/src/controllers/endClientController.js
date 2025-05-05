@@ -1,43 +1,15 @@
-const Driver = require('../models/Driver');
+const EndClient = require('../models/EndClient');
 const Client = require('../models/Client');
-const { Op } = require('sequelize');
 
 // Funções de validação
 const validateRequiredFields = (data) => {
-  const requiredFields = ['name', 'cnh', 'cnh_expiration', 'phone'];
+  const requiredFields = ['name', 'address', 'city', 'state', 'phone'];
   const missingFields = requiredFields.filter(field => !data[field]);
   
   if (missingFields.length > 0) {
     return {
       isValid: false,
       error: `Campos obrigatórios não preenchidos: ${missingFields.join(', ')}`
-    };
-  }
-  return { isValid: true };
-};
-
-const validateCNH = (cnh) => {
-  // Remove caracteres não numéricos
-  const cleanCNH = cnh.replace(/\D/g, '');
-  
-  // Verifica se tem 11 dígitos
-  if (cleanCNH.length !== 11) {
-    return {
-      isValid: false,
-      error: 'CNH deve conter 11 dígitos'
-    };
-  }
-  return { isValid: true };
-};
-
-const validateCNHExpiration = (expirationDate) => {
-  const today = new Date();
-  const expiration = new Date(expirationDate);
-  
-  if (expiration < today) {
-    return {
-      isValid: false,
-      error: 'Data de expiração da CNH não pode ser no passado'
     };
   }
   return { isValid: true };
@@ -57,12 +29,12 @@ const validatePhone = (phone) => {
   return { isValid: true };
 };
 
-// Listar motoristas
-exports.listDrivers = async (req, res) => {
+// Listar clientes finais
+exports.listEndClients = async (req, res) => {
   try {
     const where = {};
     
-    // Se for client_admin, só pode ver seus próprios motoristas
+    // Se for client_admin, só pode ver seus próprios clientes finais
     if (req.user.role === 'client_admin') {
       // Busca o cliente onde o usuário é o criador
       const client = await Client.findOne({
@@ -76,7 +48,7 @@ exports.listDrivers = async (req, res) => {
       where.client_id = client.id;
     }
 
-    const drivers = await Driver.findAll({
+    const endClients = await EndClient.findAll({
       where,
       include: [{
         model: Client,
@@ -85,19 +57,19 @@ exports.listDrivers = async (req, res) => {
       }]
     });
 
-    res.json(drivers);
+    res.json(endClients);
   } catch (error) {
-    console.error('Erro ao listar motoristas:', error);
-    res.status(500).json({ error: 'Erro ao listar motoristas' });
+    console.error('Erro ao listar clientes finais:', error);
+    res.status(500).json({ error: 'Erro ao listar clientes finais' });
   }
 };
 
-// Obter um motorista específico
-exports.getDriver = async (req, res) => {
+// Obter um cliente final específico
+exports.getEndClient = async (req, res) => {
   try {
     const where = { id: req.params.id };
     
-    // Se for client_admin, só pode ver seus próprios motoristas
+    // Se for client_admin, só pode ver seus próprios clientes finais
     if (req.user.role === 'client_admin') {
       // Busca o cliente onde o usuário é o criador
       const client = await Client.findOne({
@@ -111,7 +83,7 @@ exports.getDriver = async (req, res) => {
       where.client_id = client.id;
     }
 
-    const driver = await Driver.findOne({
+    const endClient = await EndClient.findOne({
       where,
       include: [{
         model: Client,
@@ -120,21 +92,21 @@ exports.getDriver = async (req, res) => {
       }]
     });
 
-    if (!driver) {
-      return res.status(404).json({ error: 'Motorista não encontrado' });
+    if (!endClient) {
+      return res.status(404).json({ error: 'Cliente final não encontrado' });
     }
 
-    res.json(driver);
+    res.json(endClient);
   } catch (error) {
-    console.error('Erro ao buscar motorista:', error);
-    res.status(500).json({ error: 'Erro ao buscar motorista' });
+    console.error('Erro ao buscar cliente final:', error);
+    res.status(500).json({ error: 'Erro ao buscar cliente final' });
   }
 };
 
-// Criar motorista
-exports.createDriver = async (req, res) => {
+// Criar cliente final
+exports.createEndClient = async (req, res) => {
   try {
-    const { name, cnh, cnh_expiration, phone } = req.body;
+    const { name, address, city, state, phone, notes } = req.body;
 
     // Validação dos campos obrigatórios
     const requiredValidation = validateRequiredFields(req.body);
@@ -142,28 +114,10 @@ exports.createDriver = async (req, res) => {
       return res.status(400).json({ error: requiredValidation.error });
     }
 
-    // Validação da CNH
-    const cnhValidation = validateCNH(cnh);
-    if (!cnhValidation.isValid) {
-      return res.status(400).json({ error: cnhValidation.error });
-    }
-
-    // Validação da data de expiração da CNH
-    const expirationValidation = validateCNHExpiration(cnh_expiration);
-    if (!expirationValidation.isValid) {
-      return res.status(400).json({ error: expirationValidation.error });
-    }
-
     // Validação do telefone
     const phoneValidation = validatePhone(phone);
     if (!phoneValidation.isValid) {
       return res.status(400).json({ error: phoneValidation.error });
-    }
-
-    // Verifica se já existe um motorista com a mesma CNH
-    const existingDriver = await Driver.findOne({ where: { cnh } });
-    if (existingDriver) {
-      return res.status(400).json({ error: 'Já existe um motorista cadastrado com esta CNH' });
     }
 
     let client_id;
@@ -187,30 +141,31 @@ exports.createDriver = async (req, res) => {
       client_id = req.body.client_id;
     }
 
-    // Garante que o created_by seja sempre o usuário autenticado
-    const driver = await Driver.create({
+    const endClient = await EndClient.create({
       name,
-      cnh,
-      cnh_expiration,
+      address,
+      city,
+      state,
       phone,
+      notes,
       client_id,
       created_by: req.user.id
     });
 
-    res.status(201).json(driver);
+    res.status(201).json(endClient);
   } catch (error) {
-    console.error('Erro ao criar motorista:', error);
-    res.status(500).json({ error: 'Erro ao criar motorista' });
+    console.error('Erro ao criar cliente final:', error);
+    res.status(500).json({ error: 'Erro ao criar cliente final' });
   }
 };
 
-// Atualizar motorista
-exports.updateDriver = async (req, res) => {
+// Atualizar cliente final
+exports.updateEndClient = async (req, res) => {
   try {
-    const { name, cnh, cnh_expiration, phone, status } = req.body;
+    const { name, address, city, state, phone, notes } = req.body;
     const where = { id: req.params.id };
     
-    // Se for client_admin, só pode atualizar seus próprios motoristas
+    // Se for client_admin, só pode atualizar seus próprios clientes finais
     if (req.user.role === 'client_admin') {
       // Busca o cliente onde o usuário é o criador
       const client = await Client.findOne({
@@ -224,10 +179,10 @@ exports.updateDriver = async (req, res) => {
       where.client_id = client.id;
     }
 
-    const driver = await Driver.findOne({ where });
+    const endClient = await EndClient.findOne({ where });
 
-    if (!driver) {
-      return res.status(404).json({ error: 'Motorista não encontrado' });
+    if (!endClient) {
+      return res.status(404).json({ error: 'Cliente final não encontrado' });
     }
 
     // Validação dos campos obrigatórios
@@ -236,56 +191,34 @@ exports.updateDriver = async (req, res) => {
       return res.status(400).json({ error: requiredValidation.error });
     }
 
-    // Validação da CNH
-    const cnhValidation = validateCNH(cnh);
-    if (!cnhValidation.isValid) {
-      return res.status(400).json({ error: cnhValidation.error });
-    }
-
-    // Validação da data de expiração da CNH
-    const expirationValidation = validateCNHExpiration(cnh_expiration);
-    if (!expirationValidation.isValid) {
-      return res.status(400).json({ error: expirationValidation.error });
-    }
-
     // Validação do telefone
     const phoneValidation = validatePhone(phone);
     if (!phoneValidation.isValid) {
       return res.status(400).json({ error: phoneValidation.error });
     }
 
-    // Verifica se já existe outro motorista com a mesma CNH
-    const existingDriver = await Driver.findOne({
-      where: {
-        cnh,
-        id: { [Op.ne]: req.params.id } // Exclui o próprio motorista da busca
-      }
-    });
-    if (existingDriver) {
-      return res.status(400).json({ error: 'Já existe outro motorista cadastrado com esta CNH' });
-    }
-
-    await driver.update({
+    await endClient.update({
       name,
-      cnh,
-      cnh_expiration,
+      address,
+      city,
+      state,
       phone,
-      status
+      notes
     });
 
-    res.json(driver);
+    res.json(endClient);
   } catch (error) {
-    console.error('Erro ao atualizar motorista:', error);
-    res.status(500).json({ error: 'Erro ao atualizar motorista' });
+    console.error('Erro ao atualizar cliente final:', error);
+    res.status(500).json({ error: 'Erro ao atualizar cliente final' });
   }
 };
 
-// Deletar motorista
-exports.deleteDriver = async (req, res) => {
+// Deletar cliente final
+exports.deleteEndClient = async (req, res) => {
   try {
     const where = { id: req.params.id };
     
-    // Se for client_admin, só pode deletar seus próprios motoristas
+    // Se for client_admin, só pode deletar seus próprios clientes finais
     if (req.user.role === 'client_admin') {
       // Busca o cliente onde o usuário é o criador
       const client = await Client.findOne({
@@ -299,16 +232,16 @@ exports.deleteDriver = async (req, res) => {
       where.client_id = client.id;
     }
 
-    const driver = await Driver.findOne({ where });
+    const endClient = await EndClient.findOne({ where });
 
-    if (!driver) {
-      return res.status(404).json({ error: 'Motorista não encontrado' });
+    if (!endClient) {
+      return res.status(404).json({ error: 'Cliente final não encontrado' });
     }
 
-    await driver.destroy();
+    await endClient.destroy();
     res.status(204).send();
   } catch (error) {
-    console.error('Erro ao deletar motorista:', error);
-    res.status(500).json({ error: 'Erro ao deletar motorista' });
+    console.error('Erro ao deletar cliente final:', error);
+    res.status(500).json({ error: 'Erro ao deletar cliente final' });
   }
 }; 
