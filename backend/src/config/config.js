@@ -12,7 +12,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'your_secure_db_password_here',
+    dialect: 'postgres',
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your_secure_jwt_secret_here',

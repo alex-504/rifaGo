@@ -4,6 +4,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const clientRoutes = require('./routes/clients');
 const driverRoutes = require('./routes/drivers');
+const models = require('./models');
 
 const app = express();
 

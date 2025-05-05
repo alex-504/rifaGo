@@ -1,5 +1,7 @@
 const Driver = require('../models/Driver');
 const Client = require('../models/Client');
+const User = require('../models/User');
+const sequelize = require('../config/database/connection');
 
 // Listar motoristas
 exports.listDrivers = async (req, res) => {
@@ -77,8 +79,17 @@ exports.getDriver = async (req, res) => {
 
 // Criar motorista
 exports.createDriver = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
   try {
-    const { name, cnh, cnh_expiration, phone } = req.body;
+    const { 
+      name, 
+      email, 
+      password,
+      cnh, 
+      cnh_expiration, 
+      phone 
+    } = req.body;
 
     let client_id;
 
@@ -99,21 +110,78 @@ exports.createDriver = async (req, res) => {
         return res.status(400).json({ error: 'client_id é obrigatório' });
       }
       client_id = req.body.client_id;
+
+      // Verificar se o cliente existe
+      const client = await Client.findByPk(client_id);
+      if (!client) {
+        return res.status(400).json({ error: 'Cliente não encontrado' });
+      }
     }
 
-    // Garante que o created_by seja sempre o usuário autenticado
+    // Verificar se já existe um usuário com este email
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email já está em uso' });
+    }
+
+    // Verificar se já existe um motorista com esta CNH
+    const existingDriver = await Driver.findOne({ where: { cnh } });
+    if (existingDriver) {
+      return res.status(400).json({ error: 'CNH já está em uso' });
+    }
+
+    // 1. Criar usuário do motorista
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role: 'driver',
+      status: 'active',
+      client_id
+    }, { transaction });
+
+    // 2. Criar registro do motorista
     const driver = await Driver.create({
       name,
       cnh,
-      cnh_expiration,
+      cnh_expiration: new Date(cnh_expiration), // Converter string para Date
       phone,
+      status: 'active',
       client_id,
-      created_by: req.user.id // Sempre usa o ID do usuário autenticado
+      created_by: req.user.id,
+      user_id: user.id
+    }, { transaction });
+
+    await transaction.commit();
+
+    // Retornar dados do motorista com informações do usuário
+    const driverWithUser = await Driver.findOne({
+      where: { id: driver.id },
+      include: [
+        {
+          model: Client,
+          as: 'client',
+          attributes: ['id', 'name']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email', 'role', 'status']
+        }
+      ]
     });
 
-    res.status(201).json(driver);
+    res.status(201).json(driverWithUser);
   } catch (error) {
+    await transaction.rollback();
     console.error('Erro ao criar motorista:', error);
+    // Retornar mensagem de erro mais específica
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({ 
+        error: 'Erro de validação', 
+        details: error.errors.map(e => e.message)
+      });
+    }
     res.status(500).json({ error: 'Erro ao criar motorista' });
   }
 };

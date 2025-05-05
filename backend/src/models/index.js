@@ -2,28 +2,27 @@ const User = require('./User');
 const Client = require('./Client');
 const Driver = require('./Driver');
 const EndClient = require('./EndClient');
-const sequelize = require('../config/database/connection');
 
-// Relacionamentos
-Client.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
-User.hasMany(Client, { foreignKey: 'created_by', as: 'clients' });
+// Client Relationships
+Client.hasMany(User, { foreignKey: 'client_id', as: 'users' });
+Client.hasMany(Driver, { foreignKey: 'client_id', as: 'drivers' });
 
-Client.hasMany(Driver, { foreignKey: 'client_id' });
-Driver.belongsTo(Client, { foreignKey: 'client_id' });
+// User Relationships
+User.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
+User.hasOne(Driver, { foreignKey: 'user_id', as: 'driver' });
 
-User.hasMany(Driver, { foreignKey: 'created_by' });
-Driver.belongsTo(User, { foreignKey: 'created_by' });
+// Driver Relationships
+Driver.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
+Driver.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+Driver.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+Driver.hasMany(EndClient, { foreignKey: 'driver_id', as: 'endClients' });
 
-Client.hasMany(EndClient, { foreignKey: 'client_id' });
-EndClient.belongsTo(Client, { foreignKey: 'client_id' });
-
-User.hasMany(EndClient, { foreignKey: 'created_by' });
-EndClient.belongsTo(User, { foreignKey: 'created_by' });
+// EndClient Relationships
+EndClient.belongsTo(Driver, { foreignKey: 'driver_id', as: 'driver' });
 
 module.exports = {
-  sequelize,
   User,
   Client,
   Driver,
-  EndClient,
+  EndClient
 }; 

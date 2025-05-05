@@ -1,7 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database/connection');
-const User = require('./User');
-const Client = require('./Client');
 
 class Driver extends Model {}
 
@@ -36,18 +34,14 @@ Driver.init(
     client_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Client,
-        key: 'id',
-      },
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     created_by: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
     },
   },
   {
@@ -57,9 +51,5 @@ Driver.init(
     timestamps: true,
   }
 );
-
-// Relacionamentos
-Driver.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
-Driver.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
 
 module.exports = Driver; 

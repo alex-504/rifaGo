@@ -1,7 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database/connection');
 const bcrypt = require('bcryptjs');
-const Client = require('./Client');
 
 class User extends Model {
   // Método para verificar senha
@@ -52,10 +51,6 @@ User.init(
     client_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: {
-        model: Client,
-        key: 'id'
-      }
     },
     last_login: {
       type: DataTypes.DATE,
@@ -76,8 +71,5 @@ User.init(
     },
   }
 );
-
-// Relacionamento com Client
-User.belongsTo(Client, { foreignKey: 'client_id', as: 'client' });
 
 module.exports = User; 
