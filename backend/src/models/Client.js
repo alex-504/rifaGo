@@ -49,7 +49,18 @@ Client.init(
     tableName: 'clients',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
+    hooks: {
+      beforeUpdate: async (instance, options) => {
+        // Se o created_by está sendo alterado, verifica se é uma transferência de propriedade
+        if (instance.changed('created_by')) {
+          const originalInstance = await Client.findByPk(instance.id);
+          if (originalInstance.created_by !== instance.created_by && !options.transferOwnership) {
+            throw new Error('Não é permitido alterar o created_by diretamente');
+          }
+        }
+      }
+    }
   }
 );
 

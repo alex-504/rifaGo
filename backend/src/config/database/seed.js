@@ -5,15 +5,15 @@ async function seed() {
   try {
     // Verifica se já existe um admin
     const adminExists = await User.findOne({
-      where: { email: 'admin@rifago.com' },
+      where: { email: process.env.ADMIN_EMAIL || 'admin@example.com' },
     });
 
     if (!adminExists) {
       // Cria o usuário admin
       await User.create({
         name: 'Admin RifaGo',
-        email: 'admin@rifago.com',
-        password: 'admin123', // Será hasheada pelo hook do modelo
+        email: process.env.ADMIN_EMAIL || 'admin@example.com',
+        password: process.env.ADMIN_PASSWORD || 'changeme123', // Será hasheada pelo hook do modelo
         role: 'app_admin',
         status: 'active',
       });

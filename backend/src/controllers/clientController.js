@@ -1,4 +1,7 @@
-const { Client, User } = require('../models');
+const { Client } = require('../models');
+const { User } = require('../models');
+const { Op } = require('sequelize');
+const { sequelize } = require('../config/database/connection');
 
 // Listar todos os clientes
 exports.listClients = async (req, res) => {
@@ -129,5 +132,47 @@ exports.deleteClient = async (req, res) => {
     res.json({ message: 'Cliente deletado com sucesso' });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao deletar cliente' });
+  }
+};
+
+// Transferir propriedade do cliente
+exports.transferOwnership = async (req, res) => {
+  try {
+    const { new_owner_id } = req.body;
+    const client = await Client.findByPk(req.params.id);
+    
+    if (!client) {
+      return res.status(404).json({ error: 'Cliente não encontrado' });
+    }
+
+    // Apenas app_admin pode transferir propriedade
+    if (req.user.role !== 'app_admin') {
+      return res.status(403).json({ error: 'Apenas app_admin pode transferir propriedade de clientes' });
+    }
+
+    // Verifica se o novo proprietário existe e é um client_admin
+    const newOwner = await User.findOne({
+      where: {
+        id: new_owner_id,
+        role: 'client_admin'
+      }
+    });
+
+    if (!newOwner) {
+      return res.status(400).json({ error: 'Novo proprietário não encontrado ou não é um client_admin' });
+    }
+
+    // Atualiza o created_by usando o modelo
+    await client.update(
+      { created_by: new_owner_id },
+      { transferOwnership: true }
+    );
+
+    // Busca o cliente atualizado
+    const updatedClient = await Client.findByPk(client.id);
+    res.json(updatedClient);
+  } catch (error) {
+    console.error('Erro ao transferir propriedade do cliente:', error);
+    res.status(500).json({ error: 'Erro ao transferir propriedade do cliente' });
   }
 }; 

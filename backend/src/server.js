@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
-const clientRoutes = require('./routes/clients');
+const clientRoutes = require('./routes/clientRoutes');
 const driverRoutes = require('./routes/drivers');
 
 const app = express();
