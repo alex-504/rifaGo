@@ -2,21 +2,21 @@ require('dotenv').config();
 
 module.exports = {
   development: {
-    username: process.env.DB_USERNAME || 'your_secure_db_password_here',
-    password: process.env.DB_PASSWORD || 'your_secure_db_password_here',
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'rifago_dev',
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    dialect: 'your_secure_db_password_here',
+    dialect: 'postgres',
     logging: false,
   },
   test: {
-    username: process.env.DB_USERNAME || 'your_secure_db_password_here',
-    password: process.env.DB_PASSWORD || 'your_secure_db_password_here',
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'rifago_test',
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    dialect: 'your_secure_db_password_here',
+    dialect: 'postgres',
     logging: false,
   },
   production: {
@@ -25,7 +25,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'your_secure_db_password_here',
+    dialect: 'postgres',
     logging: false,
     dialectOptions: {
       ssl: {
